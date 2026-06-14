@@ -11,7 +11,7 @@
         placeholder="Buscar por nº (Enter para buscar)"
       />
     </div>
-    <button class="btn-primary" (click)="abrirModal()">+ Nova OS</button>
+    <button class="btn-primary" type="button" (click)="abrirModal()">+ Nova OS</button>
   </div>
 
   @if (erroBusca) {
@@ -55,6 +55,7 @@
                   @if (os.statusOs !== 'FINALIZACAO') {
                     <button
                       class="btn-avancar"
+                      type="button"
                       [class.carregando]="estaAvancando(os.id)"
                       [disabled]="estaAvancando(os.id)"
                       (click)="avancar(os)"
@@ -80,7 +81,7 @@
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h3>Nova Ordem de Serviço</h3>
-          <button class="btn-fechar" (click)="fecharModal()">✕</button>
+          <button class="btn-fechar" type="button" (click)="fecharModal()">✕</button>
         </div>
 
         @if (erroModal) {

@@ -147,7 +147,7 @@
 
         <form class="modal-form" (ngSubmit)="salvar()">
 
-          <!-- FUNÇÕES -->
+          <!-- FUNÇÕES: apenas Nome + Salário Base -->
           @if (abaAtiva === 'funcoes') {
             <div class="campo">
               <label>Nome <span class="obrig">*</span></label>
@@ -160,7 +160,7 @@
             </div>
           }
 
-          <!-- COLABORADORES -->
+          <!-- COLABORADORES: Nome + Matrícula + Admissão + Função por FK (select) -->
           @if (abaAtiva === 'colaboradores') {
             <div class="campo">
               <label>Nome <span class="obrig">*</span></label>

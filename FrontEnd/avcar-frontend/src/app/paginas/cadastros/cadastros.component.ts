@@ -131,9 +131,11 @@ export class CadastrosComponent implements OnInit {
   tituloModal(): string {
     if (!this.modoEdicao) return this.tituloNovo();
     const editar: Record<AbaId, string> = {
-      funcoes: 'Editar Função', colaboradores: 'Editar Colaborador',
-      fornecedores: 'Editar Fornecedor', pecas: 'Editar Peça',
-      servicos: 'Editar Serviço',
+      funcoes:       'Editar Função',
+      colaboradores: 'Editar Colaborador',
+      fornecedores:  'Editar Fornecedor',
+      pecas:         'Editar Peça',
+      servicos:      'Editar Serviço',
     };
     return editar[this.abaAtiva];
   }
@@ -256,29 +258,35 @@ export class CadastrosComponent implements OnInit {
         };
         break;
 
-      case 'pecas':
+      case 'pecas': {
         if (!this.form.codigoNacional.trim()) { this.erroModal = 'Código Nacional é obrigatório.'; return; }
         if (!this.form.nome.trim())           { this.erroModal = 'Nome é obrigatório.'; return; }
         if (this.form.valor === null)          { this.erroModal = 'Valor é obrigatório.'; return; }
+        const garantiaPeca = this.parseGarantia(this.form.garantia);
+        if (garantiaPeca === null) { this.erroModal = 'Informe a garantia iniciando com o número de dias.'; return; }
         endpoint = '/pecas';
         payload  = {
           codigoNacional: this.form.codigoNacional.trim(),
           nome:           this.form.nome.trim(),
           valor:          this.form.valor,
-          garantia:       this.form.garantia.trim() || undefined,
+          garantia:       garantiaPeca,
         };
         break;
+      }
 
-      case 'servicos':
+      case 'servicos': {
         if (!this.form.descricao.trim()) { this.erroModal = 'Descrição é obrigatória.'; return; }
         if (this.form.valorBase === null) { this.erroModal = 'Valor Base é obrigatório.'; return; }
+        const garantiaServico = this.parseGarantia(this.form.garantia);
+        if (garantiaServico === null) { this.erroModal = 'Informe a garantia iniciando com o número de dias.'; return; }
         endpoint = '/servicos-internos';
         payload  = {
           descricao: this.form.descricao.trim(),
           valorBase: this.form.valorBase,
-          garantia:  this.form.garantia.trim() || undefined,
+          garantia:  garantiaServico,
         };
         break;
+      }
 
       default:
         return;
@@ -310,5 +318,13 @@ export class CadastrosComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  // Retorna undefined (sem garantia), number (dias), ou null (input inválido).
+  private parseGarantia(value: string): number | undefined | null {
+    const str = value.trim();
+    if (!str) return undefined;
+    const dias = Number.parseInt(str, 10);
+    return Number.isNaN(dias) ? null : dias;
   }
 }

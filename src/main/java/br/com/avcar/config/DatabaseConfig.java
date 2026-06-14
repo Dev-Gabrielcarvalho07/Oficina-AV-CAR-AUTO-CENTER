@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/** Configuração de conexão com o banco de dados — lê database.properties do classpath. */
 public class DatabaseConfig {
 
     private final String url;
@@ -22,12 +23,31 @@ public class DatabaseConfig {
         } catch (IOException e) {
             throw new RuntimeException("Erro ao carregar database.properties", e);
         }
-        this.url      = props.getProperty("db.url");
-        this.user     = props.getProperty("db.user");
-        this.password = props.getProperty("db.password");
+
+        this.url = required(props, "db.url");
+        this.user = required(props, "db.user");
+        this.password = required(props, "db.password");
     }
 
-    public String getUrl()      { return url; }
-    public String getUser()     { return user; }
-    public String getPassword() { return password; }
+    public String getUrl() {
+        return url;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    private static String required(Properties props, String key) {
+        String value = props.getProperty(key);
+        if (value == null || value.isBlank()) {
+            throw new RuntimeException(
+                "Configure a propriedade " + key + " em src/main/resources/database.properties."
+            );
+        }
+        return value.trim();
+    }
 }

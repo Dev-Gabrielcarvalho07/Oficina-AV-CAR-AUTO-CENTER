@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict SOdA8G0TwfYnnowuT4suCh4vFFLfldPPTKqbplvJVlT9a1lEFstn6Z1amXZ6cQW
-
 -- Dumped from database version 17.9
 -- Dumped by pg_dump version 17.9
 
@@ -1180,6 +1178,4 @@ ALTER TABLE ONLY public.veiculo
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict SOdA8G0TwfYnnowuT4suCh4vFFLfldPPTKqbplvJVlT9a1lEFstn6Z1amXZ6cQW
 
