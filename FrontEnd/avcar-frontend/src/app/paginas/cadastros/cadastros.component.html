@@ -1,0 +1,278 @@
+<section class="cad-page">
+
+  <!-- Abas -->
+  <div class="abas-bar">
+    @for (aba of abas; track aba.id) {
+      <button
+        type="button"
+        class="aba-btn"
+        [class.ativa]="abaAtiva === aba.id"
+        (click)="ativarAba(aba.id)"
+      >{{ aba.label }}</button>
+    }
+  </div>
+
+  <!-- Header: botão Novo -->
+  <div class="cad-header">
+    <button class="btn-primary" [disabled]="carregando" (click)="abrirModal()">
+      + {{ tituloNovo() }}
+    </button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card tabela-wrap">
+    @if (carregando) {
+      <div class="skeleton" style="height:200px"></div>
+    } @else {
+
+      @if (abaAtiva === 'funcoes') {
+        <table class="table">
+          <thead><tr><th>Nome</th><th>Salário Base</th><th></th></tr></thead>
+          <tbody>
+            @if (funcoes.length === 0) {
+              <tr><td colspan="3" class="vazio-linha">Nenhum registro ainda</td></tr>
+            } @else {
+              @for (f of funcoes; track f.id) {
+                <tr>
+                  <td>{{ f.nome }}</td>
+                  <td class="mono-accent">{{ formatarMoeda(f.salarioBase) }}</td>
+                  <td class="col-acao"><button class="btn-row-action" (click)="abrirModalEdicao(f)">Editar</button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (abaAtiva === 'colaboradores') {
+        <table class="table">
+          <thead><tr><th>Nome</th><th>Matrícula</th><th>Função</th><th>Admissão</th><th></th></tr></thead>
+          <tbody>
+            @if (colaboradores.length === 0) {
+              <tr><td colspan="5" class="vazio-linha">Nenhum registro ainda</td></tr>
+            } @else {
+              @for (c of colaboradores; track c.id) {
+                <tr>
+                  <td>{{ c.nome }}</td>
+                  <td class="mono">{{ c.matricula }}</td>
+                  <td>{{ nomeFuncao(c.idFuncao) }}</td>
+                  <td>{{ c.dataAdmissao }}</td>
+                  <td class="col-acao"><button class="btn-row-action" (click)="abrirModalEdicao(c)">Editar</button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (abaAtiva === 'fornecedores') {
+        <table class="table">
+          <thead><tr><th>Nome</th><th>CNPJ</th><th>Tipo</th><th>Telefone</th><th>E-mail</th><th></th></tr></thead>
+          <tbody>
+            @if (fornecedores.length === 0) {
+              <tr><td colspan="6" class="vazio-linha">Nenhum registro ainda</td></tr>
+            } @else {
+              @for (f of fornecedores; track f.id) {
+                <tr>
+                  <td>{{ f.nome }}</td>
+                  <td class="mono">{{ f.cnpj }}</td>
+                  <td>{{ labelTipo(f.tipoFornecedor) }}</td>
+                  <td class="mono">{{ f.telefone ?? '—' }}</td>
+                  <td>{{ f.email ?? '—' }}</td>
+                  <td class="col-acao"><button class="btn-row-action" (click)="abrirModalEdicao(f)">Editar</button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (abaAtiva === 'pecas') {
+        <table class="table">
+          <thead><tr><th>Código</th><th>Nome</th><th>Valor</th><th>Garantia</th><th></th></tr></thead>
+          <tbody>
+            @if (pecas.length === 0) {
+              <tr><td colspan="5" class="vazio-linha">Nenhum registro ainda</td></tr>
+            } @else {
+              @for (p of pecas; track p.id) {
+                <tr>
+                  <td class="mono">{{ p.codigoNacional }}</td>
+                  <td>{{ p.nome }}</td>
+                  <td class="mono-accent">{{ formatarMoeda(p.valor) }}</td>
+                  <td>{{ p.garantia ?? '—' }}</td>
+                  <td class="col-acao"><button class="btn-row-action" (click)="abrirModalEdicao(p)">Editar</button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (abaAtiva === 'servicos') {
+        <table class="table">
+          <thead><tr><th>Descrição</th><th>Valor Base</th><th>Garantia</th><th></th></tr></thead>
+          <tbody>
+            @if (servicos.length === 0) {
+              <tr><td colspan="4" class="vazio-linha">Nenhum registro ainda</td></tr>
+            } @else {
+              @for (s of servicos; track s.id) {
+                <tr>
+                  <td>{{ s.descricao }}</td>
+                  <td class="mono-accent">{{ formatarMoeda(s.valorBase) }}</td>
+                  <td>{{ s.garantia ?? '—' }}</td>
+                  <td class="col-acao"><button class="btn-row-action" (click)="abrirModalEdicao(s)">Editar</button></td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      }
+
+    }
+  </div>
+
+  <!-- Modal único — campos condicionais por aba -->
+  @if (modalAberto) {
+    <div class="overlay" (click)="fecharModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h3>{{ tituloModal() }}</h3>
+          <button class="btn-fechar" type="button" (click)="fecharModal()">✕</button>
+        </div>
+
+        @if (erroModal) {
+          <p class="msg-erro">{{ erroModal }}</p>
+        }
+
+        <form class="modal-form" (ngSubmit)="salvar()">
+
+          <!-- FUNÇÕES -->
+          @if (abaAtiva === 'funcoes') {
+            <div class="campo">
+              <label>Nome <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Ex: Mecânico" />
+            </div>
+            <div class="campo">
+              <label>Salário Base</label>
+              <input class="input" type="number" step="0.01" min="0"
+                     [(ngModel)]="form.salarioBase" name="salarioBase" placeholder="0,00" />
+            </div>
+          }
+
+          <!-- COLABORADORES -->
+          @if (abaAtiva === 'colaboradores') {
+            <div class="campo">
+              <label>Nome <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome completo" />
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Matrícula <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.matricula" name="matricula" placeholder="COL-001" />
+              </div>
+              <div class="campo">
+                <label>Admissão <span class="obrig">*</span></label>
+                <input class="input" type="date" [(ngModel)]="form.dataAdmissao" name="dataAdmissao" />
+              </div>
+            </div>
+            <div class="campo">
+              <label>Função <span class="obrig">*</span></label>
+              <select class="input" [(ngModel)]="form.idFuncao" name="idFuncao">
+                <option [ngValue]="null">Selecione a função…</option>
+                @for (f of funcoesSelect; track f.id) {
+                  <option [ngValue]="f.id">{{ f.nome }}</option>
+                }
+              </select>
+            </div>
+          }
+
+          <!-- FORNECEDORES -->
+          @if (abaAtiva === 'fornecedores') {
+            <div class="campo">
+              <label>Nome <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome da empresa" />
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>CNPJ <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+              </div>
+              <div class="campo">
+                <label>Tipo <span class="obrig">*</span></label>
+                <select class="input" [(ngModel)]="form.tipoFornecedor" name="tipoFornecedor">
+                  <option value="PECAS">Peças</option>
+                  <option value="SERVICO">Serviço</option>
+                  <option value="AMBOS">Ambos</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Telefone</label>
+                <input class="input" [(ngModel)]="form.telefone" name="telefone" placeholder="(00) 0000-0000" />
+              </div>
+              <div class="campo">
+                <label>E-mail</label>
+                <input class="input" [(ngModel)]="form.email" name="email" placeholder="contato@empresa.com" />
+              </div>
+            </div>
+          }
+
+          <!-- PEÇAS -->
+          @if (abaAtiva === 'pecas') {
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Código Nacional <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.codigoNacional" name="codigoNacional" placeholder="EAN / código" />
+              </div>
+              <div class="campo">
+                <label>Nome <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome da peça" />
+              </div>
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Valor <span class="obrig">*</span></label>
+                <input class="input" type="number" step="0.01" min="0"
+                       [(ngModel)]="form.valor" name="valor" placeholder="0,00" />
+              </div>
+              <div class="campo">
+                <label>Garantia</label>
+                <input class="input" [(ngModel)]="form.garantia" name="garantia" placeholder="Ex: 6 meses" />
+              </div>
+            </div>
+          }
+
+          <!-- SERVIÇOS -->
+          @if (abaAtiva === 'servicos') {
+            <div class="campo">
+              <label>Descrição <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.descricao" name="descricao" placeholder="Descrição do serviço" />
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Valor Base <span class="obrig">*</span></label>
+                <input class="input" type="number" step="0.01" min="0"
+                       [(ngModel)]="form.valorBase" name="valorBase" placeholder="0,00" />
+              </div>
+              <div class="campo">
+                <label>Garantia</label>
+                <input class="input" [(ngModel)]="form.garantia" name="garantia" placeholder="Ex: 90 dias" />
+              </div>
+            </div>
+          }
+
+          <div class="modal-acoes">
+            <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="salvando">
+              {{ salvando ? 'Salvando…' : (modoEdicao ? 'Salvar alterações' : 'Salvar') }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
+</section>

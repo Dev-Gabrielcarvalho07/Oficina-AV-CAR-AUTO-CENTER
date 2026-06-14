@@ -1,0 +1,17 @@
+# Java / Maven
+target/
+*.class
+
+# Senha do banco (NUNCA subir)
+database.properties
+src/main/resources/database.properties
+
+# Angular
+node_modules/
+FrontEnd/avcar-frontend/node_modules/
+FrontEnd/avcar-frontend/dist/
+FrontEnd/avcar-frontend/.angular/
+
+# Logs
+*.log
+server.log

@@ -1,0 +1,128 @@
+<section class="vei-page">
+
+  <!-- Header -->
+  <div class="vei-header">
+    <button class="btn-primary" (click)="abrirModal()">+ Novo veículo</button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card tabela-wrap">
+    @if (carregando) {
+      <div class="skeleton" style="height:200px"></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Ano</th>
+            <th>Cor</th>
+            <th>Quilometragem</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (veiculos.length === 0) {
+            <tr>
+              <td colspan="7" class="vazio-linha">Nenhum veículo ainda</td>
+            </tr>
+          } @else {
+            @for (v of veiculos; track v.id) {
+              <tr>
+                <td class="mono-accent">{{ v.placa }}</td>
+                <td>{{ nomeMarcaDoVeiculo(v.idModelo) }}</td>
+                <td>{{ nomeModelo(v.idModelo) }}</td>
+                <td class="mono">{{ v.anoFabricacao }}</td>
+                <td>{{ v.cor }}</td>
+                <td class="mono">{{ v.quilometragem != null ? (v.quilometragem | number) + ' km' : '—' }}</td>
+                <td>
+                  <button class="btn-row-action" (click)="abrirModalEdicao(v)">Editar</button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Modal -->
+  @if (modalAberto) {
+    <div class="overlay" (click)="fecharModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h3>{{ modoEdicao ? 'Editar Veículo' : 'Novo Veículo' }}</h3>
+          <button class="btn-fechar" type="button" (click)="fecharModal()">✕</button>
+        </div>
+
+        @if (erroModal) {
+          <p class="msg-erro">{{ erroModal }}</p>
+        }
+
+        <form class="modal-form" (ngSubmit)="salvar()">
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>Placa <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.placa" name="placa"
+                     placeholder="ABC-1234" maxlength="8" autocomplete="off" />
+            </div>
+            <div class="campo">
+              <label>Ano <span class="obrig">*</span></label>
+              <input class="input" type="number" [(ngModel)]="form.anoFabricacao" name="anoFabricacao"
+                     placeholder="Ex: 2022" min="1900" max="2100" />
+            </div>
+          </div>
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>Marca <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.marca" name="marca"
+                     placeholder="Ex: Toyota"
+                     list="datalist-marcas" autocomplete="off" />
+              <datalist id="datalist-marcas">
+                @for (m of marcas; track m.id) {
+                  <option [value]="m.nome"></option>
+                }
+              </datalist>
+            </div>
+            <div class="campo">
+              <label>Modelo <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.modelo" name="modelo"
+                     placeholder="Ex: Corolla"
+                     list="datalist-modelos" autocomplete="off" />
+              <datalist id="datalist-modelos">
+                @for (m of modelos; track m.id) {
+                  <option [value]="m.nome"></option>
+                }
+              </datalist>
+            </div>
+          </div>
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>Cor <span class="obrig">*</span></label>
+              <input class="input" [(ngModel)]="form.cor" name="cor" placeholder="Ex: Prata" />
+            </div>
+            <div class="campo">
+              <label>Quilometragem</label>
+              <input class="input" type="number" [(ngModel)]="form.quilometragem"
+                     name="quilometragem" placeholder="0" min="0" />
+            </div>
+          </div>
+
+          <div class="modal-acoes">
+            <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="salvando">
+              {{ salvando ? 'Salvando…' : (modoEdicao ? 'Salvar alterações' : 'Cadastrar') }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
+</section>

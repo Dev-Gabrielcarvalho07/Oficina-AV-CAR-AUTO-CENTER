@@ -1,0 +1,106 @@
+<section class="triagem-page">
+  <div class="triagem-grid">
+
+    <!-- ESQUERDA: Fila de chegada -->
+    <div class="painel">
+
+      <div class="painel-header">
+        <h2 class="painel-titulo">
+          Fila de chegada
+          <span class="badge badge-fifo">FIFO</span>
+        </h2>
+        <button
+          class="btn-primary"
+          [disabled]="fila.length === 0 || chamando || carregando"
+          (click)="chamarProximo()"
+        >{{ chamando ? 'Chamando…' : 'Chamar próximo' }}</button>
+      </div>
+
+      <!-- Enfileirar OS -->
+      <div class="enfileirar-wrap">
+        <input
+          class="input enfileirar-input"
+          type="number"
+          min="1"
+          [(ngModel)]="inputOs"
+          (keydown.enter)="enfileirar()"
+          placeholder="Nº da OS"
+        />
+        <button
+          class="btn-secondary"
+          [disabled]="enfileirando"
+          (click)="enfileirar()"
+        >{{ enfileirando ? '⟳' : 'Enfileirar' }}</button>
+      </div>
+
+      @if (erroFila) {
+        <p class="msg-erro">{{ erroFila }}</p>
+      }
+
+      <!-- Cards da fila -->
+      @if (carregando) {
+        <div class="skeleton" style="height:76px; border-radius: var(--radius-md)"></div>
+        <div class="skeleton" style="height:76px; border-radius: var(--radius-md); opacity:.6"></div>
+      } @else if (fila.length === 0) {
+        <div class="fila-vazia">Fila vazia</div>
+      } @else {
+        <div class="fila-lista">
+          @for (os of fila; track os.id; let i = $index) {
+            <div
+              class="fila-card"
+              [class.primeiro]="i === 0"
+              [class.card-saindo]="saindoId === os.id"
+            >
+              <span class="ordinal">{{ ordinal(i) }}</span>
+              <div class="fila-card-info">
+                <span class="card-os mono">#{{ os.numeroOs }}</span>
+                <span [class]="classeBadge(os.statusOs)">{{ rotuloStatus(os.statusOs) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+
+    <!-- DIREITA: Em atendimento -->
+    <div class="painel">
+
+      <div class="painel-header">
+        <h2 class="painel-titulo">Em atendimento</h2>
+      </div>
+
+      @if (emAtendimento) {
+        <div class="atend-card card">
+          <div class="atend-num mono">#{{ emAtendimento.numeroOs }}</div>
+          <div class="atend-rows">
+            <div class="atend-row">
+              <span class="atend-label">Status</span>
+              <span [class]="classeBadge(emAtendimento.statusOs)">
+                {{ rotuloStatus(emAtendimento.statusOs) }}
+              </span>
+            </div>
+            <div class="atend-row">
+              <span class="atend-label">Veículo</span>
+              <span class="mono atend-val">#{{ emAtendimento.idVeiculo }}</span>
+            </div>
+            <div class="atend-row">
+              <span class="atend-label">Cliente</span>
+              <span class="mono atend-val">#{{ emAtendimento.idPessoa }}</span>
+            </div>
+            @if (emAtendimento.dataEntrada) {
+              <div class="atend-row">
+                <span class="atend-label">Entrada</span>
+                <span class="atend-val">{{ emAtendimento.dataEntrada }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="fila-vazia">Nenhum veículo em atendimento.</div>
+      }
+
+    </div>
+
+  </div>
+</section>

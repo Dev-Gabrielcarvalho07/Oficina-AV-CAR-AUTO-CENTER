@@ -1,0 +1,29 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">⚙</span>
+      <div class="logo-text">
+        <span class="logo-name">AV CAR</span>
+        <span class="logo-sub">auto center</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard"      routerLinkActive="nav-active">Dashboard</a>
+      <a routerLink="/clientes"       routerLinkActive="nav-active">Clientes</a>
+      <a routerLink="/veiculos"       routerLinkActive="nav-active">Veículos</a>
+      <a routerLink="/ordens-servico" routerLinkActive="nav-active">Ordens de serviço</a>
+      <a routerLink="/triagem"        routerLinkActive="nav-active">Fila de triagem</a>
+      <a routerLink="/cadastros"      routerLinkActive="nav-active">Cadastros</a>
+    </nav>
+  </aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+    <router-outlet />
+  </div>
+</div>
+
+<app-toast />

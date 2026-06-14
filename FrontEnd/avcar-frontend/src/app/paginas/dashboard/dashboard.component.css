@@ -1,0 +1,68 @@
+.dash {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.card-skeleton {
+  height: 96px;
+}
+
+.metrica {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.metrica-rotulo {
+  font-size: 11px;
+  color: var(--text-400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metrica-valor {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-100);
+  line-height: 1;
+}
+
+.metrica-valor.execucao { color: var(--status-execucao); }
+.metrica-valor.faturado { color: var(--status-finalizacao); font-size: 20px; }
+
+.recentes-wrap {
+  padding: 18px 20px;
+}
+
+.secao-titulo {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-200);
+  margin-bottom: 4px;
+}
+
+.vazio {
+  color: var(--text-400);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.vazio-linha {
+  color: var(--text-400);
+  font-size: 13px;
+  padding: 24px 0;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+}

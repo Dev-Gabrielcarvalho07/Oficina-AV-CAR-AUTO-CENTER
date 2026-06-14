@@ -1,0 +1,47 @@
+package br.com.avcar.repository;
+
+import br.com.avcar.adapter.ResultSetAdapter;
+import br.com.avcar.model.ServicoInterno;
+import java.sql.*;
+
+public class ServicoInternoRepository extends BaseRepository<ServicoInterno, Long> {
+
+    @Override protected String getTableName()  { return "servico_interno"; }
+    @Override protected String getIdColumn()   { return "id_servico_interno"; }
+
+    @Override
+    protected ServicoInterno mapRow(ResultSet rs) throws SQLException {
+        return ResultSetAdapter.toServicoInterno(rs);
+    }
+
+    @Override
+    protected String getInsertSql() {
+        return "INSERT INTO servico_interno (descricao, valor_base, garantia) VALUES (?, ?, ?)";
+    }
+
+    @Override
+    protected void setInsertParams(PreparedStatement ps, ServicoInterno s) throws SQLException {
+        ps.setString(1, s.getDescricao());
+        ps.setObject(2, s.getValorBase());
+        ps.setObject(3, s.getGarantia());
+    }
+
+    @Override
+    protected Long extractGeneratedId(ResultSet keys) throws SQLException {
+        return keys.getLong(1);
+    }
+
+    @Override
+    protected String getUpdateSql() {
+        return "UPDATE servico_interno SET descricao = ?, valor_base = ?, garantia = ?"
+             + " WHERE id_servico_interno = ?";
+    }
+
+    @Override
+    protected void setUpdateParams(PreparedStatement ps, ServicoInterno s) throws SQLException {
+        ps.setString(1, s.getDescricao());
+        ps.setObject(2, s.getValorBase());
+        ps.setObject(3, s.getGarantia());
+        ps.setLong(4, s.getId());
+    }
+}

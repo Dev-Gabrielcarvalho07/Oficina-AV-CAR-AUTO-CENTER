@@ -1,0 +1,68 @@
+<section class="dash">
+
+  <!-- Cards -->
+  <div class="cards-grid">
+    @if (carregando) {
+      <div class="skeleton card-skeleton"></div>
+      <div class="skeleton card-skeleton"></div>
+      <div class="skeleton card-skeleton"></div>
+      <div class="skeleton card-skeleton"></div>
+    } @else {
+      <div class="card metrica">
+        <span class="metrica-rotulo">OS abertas</span>
+        <span class="metrica-valor">{{ osAbertas }}</span>
+      </div>
+      <div class="card metrica">
+        <span class="metrica-rotulo">Em execução</span>
+        <span class="metrica-valor execucao">{{ emExecucao }}</span>
+      </div>
+      <div class="card metrica">
+        <span class="metrica-rotulo">Na fila</span>
+        <span class="metrica-valor">{{ naFila }}</span>
+      </div>
+      <div class="card metrica">
+        <span class="metrica-rotulo">Faturado hoje</span>
+        <span class="metrica-valor faturado">
+          {{ faturado === 0 ? 'R$ 0,00' : formatarMoeda(faturado) }}
+        </span>
+      </div>
+    }
+  </div>
+
+  <!-- Tabela recentes -->
+  <div class="card recentes-wrap">
+    <h2 class="secao-titulo">Últimas ordens de serviço</h2>
+
+    @if (carregando) {
+      <div class="skeleton" style="height:160px;margin-top:12px"></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Entrada</th>
+            <th>Status</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (recentes.length === 0) {
+            <tr>
+              <td colspan="4" class="vazio-linha">Nenhum registro ainda</td>
+            </tr>
+          } @else {
+            @for (os of recentes; track os.id) {
+              <tr>
+                <td class="mono">#{{ os.numeroOs }}</td>
+                <td>{{ os.dataEntrada }}</td>
+                <td><span [class]="classeBadge(os.statusOs)">{{ rotuloStatus(os.statusOs) }}</span></td>
+                <td class="mono-accent">{{ formatarMoeda(os.total ?? 0) }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+</section>

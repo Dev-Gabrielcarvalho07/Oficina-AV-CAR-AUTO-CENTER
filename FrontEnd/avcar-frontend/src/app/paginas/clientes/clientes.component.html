@@ -1,0 +1,176 @@
+<section class="cli-page">
+
+  <!-- Header -->
+  <div class="cli-header">
+    <button class="btn-primary" (click)="abrirModal()">+ Novo cliente</button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card tabela-wrap">
+    @if (carregando) {
+      <div class="skeleton" style="height:200px"></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Documento</th>
+            <th>Tipo</th>
+            <th>Telefone</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (clientes.length === 0) {
+            <tr>
+              <td colspan="6" class="vazio-linha">Nenhum cliente ainda</td>
+            </tr>
+          } @else {
+            @for (c of clientes; track c.id) {
+              <tr>
+                <td>{{ c.nome }}</td>
+                <td class="mono">{{ documento(c) }}</td>
+                <td>
+                  <span [class]="isPF(c) ? 'badge badge-pf' : 'badge badge-pj'">
+                    {{ isPF(c) ? 'PF' : 'PJ' }}
+                  </span>
+                </td>
+                <td class="mono">{{ primeiroTelefone(c) }}</td>
+                <td>
+                  <span [class]="c.ativo ? 'badge badge-ativo' : 'badge badge-inativo'">
+                    {{ c.ativo ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td class="acoes-cel">
+                  <button class="btn-row-action" (click)="abrirModalEdicao(c)">Editar</button>
+                  @if (c.ativo) {
+                    <button
+                      class="btn-inativar"
+                      [class.processando]="estaInativando(c.id)"
+                      [disabled]="estaInativando(c.id)"
+                      (click)="inativar(c)"
+                    >{{ estaInativando(c.id) ? '⟳' : 'Inativar' }}</button>
+                  } @else {
+                    <span class="celula-vazia">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Modal -->
+  @if (modalAberto) {
+    <div class="overlay" (click)="fecharModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <h3>{{ modoEdicao ? 'Editar Cliente' : 'Novo Cliente' }}</h3>
+          <button class="btn-fechar" type="button" (click)="fecharModal()">✕</button>
+        </div>
+
+        <!-- Toggle PF / PJ (disabled em edição) -->
+        <div class="tipo-toggle">
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.ativo]="form.tipo === 'PF'"
+            [disabled]="modoEdicao"
+            (click)="form.tipo = 'PF'"
+          >Pessoa Física</button>
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.ativo]="form.tipo === 'PJ'"
+            [disabled]="modoEdicao"
+            (click)="form.tipo = 'PJ'"
+          >Pessoa Jurídica</button>
+        </div>
+
+        @if (erroModal) {
+          <p class="msg-erro">{{ erroModal }}</p>
+        }
+
+        <form class="modal-form" (ngSubmit)="salvar()">
+
+          <div class="campo">
+            <label>Nome <span class="obrig">*</span></label>
+            <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome completo" />
+          </div>
+
+          @if (form.tipo === 'PF') {
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>CPF <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.cpf" name="cpf" placeholder="000.000.000-00" />
+              </div>
+              <div class="campo">
+                <label>RG</label>
+                <input class="input" [(ngModel)]="form.rg" name="rg" placeholder="Opcional" />
+              </div>
+            </div>
+          } @else {
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>CNPJ <span class="obrig">*</span></label>
+                <input class="input" [(ngModel)]="form.cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+              </div>
+              <div class="campo">
+                <label>Inscrição Estadual</label>
+                <input class="input" [(ngModel)]="form.inscricaoEstadual" name="inscricaoEstadual" placeholder="Opcional" />
+              </div>
+            </div>
+            <div class="campo-grupo">
+              <div class="campo">
+                <label>Nome Fantasia</label>
+                <input class="input" [(ngModel)]="form.nomeFantasia" name="nomeFantasia" placeholder="Opcional" />
+              </div>
+              <div class="campo">
+                <label>Nome do Contato</label>
+                <input class="input" [(ngModel)]="form.nomeContato" name="nomeContato" placeholder="Opcional" />
+              </div>
+            </div>
+          }
+
+          <p class="secao-label">Endereço</p>
+
+          <div class="campo-grupo campo-grupo-addr">
+            <div class="campo">
+              <label>CEP</label>
+              <input class="input" [(ngModel)]="form.cep" name="cep" placeholder="00000-000" />
+            </div>
+            <div class="campo campo-num">
+              <label>Número</label>
+              <input class="input" [(ngModel)]="form.numero" name="numero" placeholder="Nº" />
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Logradouro</label>
+            <input class="input" [(ngModel)]="form.logradouro" name="logradouro" placeholder="Rua, Av…" />
+          </div>
+
+          <p class="secao-label">Contato</p>
+
+          <div class="campo">
+            <label>Telefone</label>
+            <input class="input" [(ngModel)]="form.telefone" name="telefone" placeholder="(00) 00000-0000" />
+          </div>
+
+          <div class="modal-acoes">
+            <button type="button" class="btn-secondary" (click)="fecharModal()">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="salvando">
+              {{ salvando ? 'Salvando…' : (modoEdicao ? 'Salvar alterações' : 'Cadastrar') }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  }
+
+</section>

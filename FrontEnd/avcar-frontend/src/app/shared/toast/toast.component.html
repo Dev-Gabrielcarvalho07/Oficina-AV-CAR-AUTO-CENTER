@@ -1,0 +1,8 @@
+<div class="toast-container">
+  @for (t of toastSvc.toasts(); track t.id) {
+    <div class="toast" [class.toast-sucesso]="t.tipo === 'sucesso'" [class.toast-erro]="t.tipo === 'erro'">
+      <span class="toast-msg">{{ t.mensagem }}</span>
+      <button class="toast-fechar" (click)="toastSvc.remover(t.id)">✕</button>
+    </div>
+  }
+</div>

@@ -1,0 +1,151 @@
+<section class="os-page">
+
+  <!-- Header -->
+  <div class="os-header">
+    <div class="busca-wrap">
+      <input
+        class="input"
+        [(ngModel)]="termoBusca"
+        (keydown)="buscarPorNumero($event)"
+        (input)="limparBusca()"
+        placeholder="Buscar por nº (Enter para buscar)"
+      />
+    </div>
+    <button class="btn-primary" (click)="abrirModal()">+ Nova OS</button>
+  </div>
+
+  @if (erroBusca) {
+    <p class="msg-erro">{{ erroBusca }}</p>
+  }
+
+  <!-- Tabela -->
+  <div class="card tabela-wrap">
+    @if (carregando) {
+      <div class="skeleton" style="height:200px"></div>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Nº</th>
+            <th>Cliente (ID)</th>
+            <th>Veículo (ID)</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (ordens.length === 0) {
+            <tr>
+              <td colspan="6" class="vazio-linha">Nenhum registro ainda</td>
+            </tr>
+          } @else {
+            @for (os of ordens; track os.id) {
+              <tr>
+                <td class="mono">#{{ os.numeroOs }}</td>
+                <td class="mono">{{ os.idPessoa }}</td>
+                <td class="mono">{{ os.idVeiculo }}</td>
+                <td>
+                  <span [class]="classeBadge(os.statusOs)" class="badge-animated">
+                    {{ rotuloStatus(os.statusOs) }}
+                  </span>
+                </td>
+                <td class="mono-accent">{{ formatarMoeda(os.total) }}</td>
+                <td>
+                  @if (os.statusOs !== 'FINALIZACAO') {
+                    <button
+                      class="btn-avancar"
+                      [class.carregando]="estaAvancando(os.id)"
+                      [disabled]="estaAvancando(os.id)"
+                      (click)="avancar(os)"
+                      title="Avançar status"
+                    >
+                      @if (estaAvancando(os.id)) { ⟳ } @else { Avançar → }
+                    </button>
+                  } @else {
+                    <span class="finalizado">Finalizada</span>
+                  }
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Modal Nova OS -->
+  @if (modalAberto) {
+    <div class="overlay" (click)="fecharModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Nova Ordem de Serviço</h3>
+          <button class="btn-fechar" (click)="fecharModal()">✕</button>
+        </div>
+
+        @if (erroModal) {
+          <p class="msg-erro">{{ erroModal }}</p>
+        }
+
+        <form class="modal-form" (ngSubmit)="salvar()">
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>ID do Cliente <span class="obrig">*</span></label>
+              <input class="input" type="number" [(ngModel)]="form.idPessoa"
+                     name="idPessoa" placeholder="Ex: 1" min="1" />
+            </div>
+            <div class="campo">
+              <label>ID do Veículo <span class="obrig">*</span></label>
+              <input class="input" type="number" [(ngModel)]="form.idVeiculo"
+                     name="idVeiculo" placeholder="Ex: 1" min="1" />
+            </div>
+          </div>
+
+          <p class="secao-label">Valores (opcionais)</p>
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>Mão de obra</label>
+              <input class="input" type="number" [(ngModel)]="form.valorMaoObra"
+                     name="valorMaoObra" placeholder="0,00" step="0.01" />
+            </div>
+            <div class="campo">
+              <label>Peças</label>
+              <input class="input" type="number" [(ngModel)]="form.valorPecas"
+                     name="valorPecas" placeholder="0,00" step="0.01" />
+            </div>
+          </div>
+
+          <div class="campo-grupo">
+            <div class="campo">
+              <label>Deslocamento</label>
+              <input class="input" type="number" [(ngModel)]="form.deslocamento"
+                     name="deslocamento" placeholder="0,00" step="0.01" />
+            </div>
+            <div class="campo">
+              <label>Guincho</label>
+              <input class="input" type="number" [(ngModel)]="form.servicoGuincho"
+                     name="servicoGuincho" placeholder="0,00" step="0.01" />
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Outros (pode ser negativo)</label>
+            <input class="input" type="number" [(ngModel)]="form.outros"
+                   name="outros" placeholder="0,00" step="0.01" />
+          </div>
+
+          <div class="modal-acoes">
+            <button type="button" class="btn-secondary" (click)="fecharModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="salvando">
+              {{ salvando ? 'Salvando…' : 'Abrir OS' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+</section>

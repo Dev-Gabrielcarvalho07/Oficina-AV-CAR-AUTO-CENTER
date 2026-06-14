@@ -1,0 +1,216 @@
+.cli-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cli-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Tabela ──────────────────────────────── */
+.tabela-wrap {
+  padding: 0;
+  overflow: hidden;
+}
+
+.vazio-linha {
+  color: var(--text-400);
+  font-size: 13px;
+  padding: 32px 0;
+  text-align: center;
+}
+
+/* ── Badges tipo PF/PJ ───────────────────── */
+.badge-pf {
+  color: var(--status-pagamento);
+  background: rgba(111,180,242,.13);
+}
+
+.badge-pj {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+/* ── Badges status ativo/inativo ─────────── */
+.badge-ativo {
+  color: var(--status-finalizacao);
+  background: rgba(74,222,128,.13);
+}
+
+.badge-inativo {
+  color: var(--text-400);
+  background: var(--bg-600);
+}
+
+/* ── Botão inativar ──────────────────────── */
+.btn-inativar {
+  background: var(--bg-600);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-300);
+  font-size: 12px;
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.btn-inativar:hover:not(:disabled) {
+  background: rgba(248,113,113,.10);
+  border-color: rgba(248,113,113,.30);
+  color: #F87171;
+}
+
+.btn-inativar.processando {
+  opacity: .5;
+  cursor: default;
+}
+
+.celula-vazia {
+  color: var(--text-400);
+  font-size: 12px;
+}
+
+.acoes-cel {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* ── Mensagem de erro ────────────────────── */
+.msg-erro {
+  color: #F87171;
+  font-size: 13px;
+  padding: 8px 12px;
+  background: rgba(248,113,113,.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(248,113,113,.2);
+}
+
+/* ── Overlay / Modal ─────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  background: var(--bg-800);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.6);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-100);
+}
+
+.btn-fechar {
+  background: none;
+  border: none;
+  color: var(--text-400);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition), background var(--transition);
+}
+.btn-fechar:hover { color: var(--text-100); background: var(--bg-600); }
+
+/* ── Toggle PF/PJ ────────────────────────── */
+.tipo-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-300);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.toggle-btn + .toggle-btn {
+  border-left: 1px solid var(--border);
+}
+
+.toggle-btn.ativo {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── Form ────────────────────────────────── */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campo-grupo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-grupo-addr {
+  grid-template-columns: 2fr 1fr;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 12px;
+  color: var(--text-300);
+}
+
+.obrig { color: var(--accent); }
+
+.secao-label {
+  font-size: 11px;
+  color: var(--text-400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 4px;
+}
+
+.modal-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
