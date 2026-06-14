@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
 import { ApiService, ApiResponse } from '../../core/api.service';
-import { OrdemServico } from '../../core/models';
+import { OrdemServico, Cliente, Veiculo } from '../../core/models';
 import { classeBadge, rotuloStatus } from '../../core/status.util';
 import { ToastService } from '../../core/toast.service';
 
@@ -19,8 +19,6 @@ interface FormNovaOS {
   outros:         number | null;
 }
 
-const EMPTY_OS: ApiResponse<OrdemServico[]> = { sucesso: false, dados: [] };
-
 @Component({
   selector: 'app-ordens-servico',
   imports: [CommonModule, FormsModule],
@@ -33,6 +31,8 @@ export class OrdensServicoComponent implements OnInit {
   private readonly toast = inject(ToastService);
 
   ordens:    OrdemServico[] = [];
+  clientes:  Cliente[]      = [];
+  veiculos:  Veiculo[]      = [];
   carregando                = true;
   erroBusca                 = '';
   termoBusca                = '';
@@ -61,12 +61,28 @@ export class OrdensServicoComponent implements OnInit {
 
   carregar(): void {
     this.carregando = true;
-    this.api.get<OrdemServico[]>('/ordens-servico').pipe(
-      catchError(() => of(EMPTY_OS)),
+    const em = <T>() => of<ApiResponse<T[]>>({ sucesso: false, dados: [] });
+    forkJoin({
+      ordens:   this.api.get<OrdemServico[]>('/ordens-servico').pipe(catchError(em<OrdemServico>)),
+      clientes: this.api.get<Cliente[]>('/clientes').pipe(catchError(em<Cliente>)),
+      veiculos: this.api.get<Veiculo[]>('/veiculos').pipe(catchError(em<Veiculo>)),
+    }).pipe(
       finalize(() => { this.carregando = false; this.cdr.detectChanges(); }),
     ).subscribe({
-      next: r => { this.ordens = r.dados ?? []; },
+      next: ({ ordens, clientes, veiculos }) => {
+        this.ordens   = ordens.dados   ?? [];
+        this.clientes = clientes.dados ?? [];
+        this.veiculos = veiculos.dados ?? [];
+      },
     });
+  }
+
+  nomeCliente(idPessoa: number): string {
+    return this.clientes.find(c => c.id === idPessoa)?.nome ?? '—';
+  }
+
+  placaVeiculo(idVeiculo: number): string {
+    return this.veiculos.find(v => v.id === idVeiculo)?.placa ?? '—';
   }
 
   buscarPorNumero(event: KeyboardEvent): void {
@@ -139,8 +155,8 @@ export class OrdensServicoComponent implements OnInit {
   }
 
   salvar(): void {
-    if (!this.form.idPessoa)  { this.erroModal = 'Informe o ID do cliente.'; return; }
-    if (!this.form.idVeiculo) { this.erroModal = 'Informe o ID do veículo.'; return; }
+    if (!this.form.idPessoa)  { this.erroModal = 'Selecione o cliente.'; return; }
+    if (!this.form.idVeiculo) { this.erroModal = 'Selecione o veículo.'; return; }
 
     this.salvando  = true;
     this.erroModal = '';
@@ -158,7 +174,7 @@ export class OrdensServicoComponent implements OnInit {
     this.api.post<OrdemServico>('/ordens-servico', payload).subscribe({
       next: r => {
         if (r.sucesso) {
-          this.toast.sucesso('Ordem de serviço aberta com sucesso.');
+          this.toast.sucesso('OS aberta com sucesso.');
           this.fecharModal();
           this.carregar();
         } else {

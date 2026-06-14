@@ -27,8 +27,8 @@
         <thead>
           <tr>
             <th>Nº</th>
-            <th>Cliente (ID)</th>
-            <th>Veículo (ID)</th>
+            <th>Cliente</th>
+            <th>Veículo</th>
             <th>Status</th>
             <th>Total</th>
             <th>Ações</th>
@@ -43,8 +43,8 @@
             @for (os of ordens; track os.id) {
               <tr>
                 <td class="mono">#{{ os.numeroOs }}</td>
-                <td class="mono">{{ os.idPessoa }}</td>
-                <td class="mono">{{ os.idVeiculo }}</td>
+                <td>{{ nomeCliente(os.idPessoa) }}</td>
+                <td class="mono-accent">{{ placaVeiculo(os.idVeiculo) }}</td>
                 <td>
                   <span [class]="classeBadge(os.statusOs)" class="badge-animated">
                     {{ rotuloStatus(os.statusOs) }}
@@ -88,17 +88,25 @@
         }
 
         <form class="modal-form" (ngSubmit)="salvar()">
-          <div class="campo-grupo">
-            <div class="campo">
-              <label>ID do Cliente <span class="obrig">*</span></label>
-              <input class="input" type="number" [(ngModel)]="form.idPessoa"
-                     name="idPessoa" placeholder="Ex: 1" min="1" />
-            </div>
-            <div class="campo">
-              <label>ID do Veículo <span class="obrig">*</span></label>
-              <input class="input" type="number" [(ngModel)]="form.idVeiculo"
-                     name="idVeiculo" placeholder="Ex: 1" min="1" />
-            </div>
+
+          <div class="campo">
+            <label>Cliente <span class="obrig">*</span></label>
+            <select class="input" [(ngModel)]="form.idPessoa" name="idPessoa">
+              <option [ngValue]="null">Selecione o cliente…</option>
+              @for (c of clientes; track c.id) {
+                <option [ngValue]="c.id">{{ c.nome }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="campo">
+            <label>Veículo <span class="obrig">*</span></label>
+            <select class="input" [(ngModel)]="form.idVeiculo" name="idVeiculo">
+              <option [ngValue]="null">Selecione o veículo…</option>
+              @for (v of veiculos; track v.id) {
+                <option [ngValue]="v.id">{{ v.placa }}</option>
+              }
+            </select>
           </div>
 
           <p class="secao-label">Valores (opcionais)</p>
