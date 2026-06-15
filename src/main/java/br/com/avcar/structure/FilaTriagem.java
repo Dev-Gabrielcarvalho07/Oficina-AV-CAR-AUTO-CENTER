@@ -1,7 +1,11 @@
 package br.com.avcar.structure;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+// PADRÃO: ITERATOR — percorre a fila FIFO sem expor os nós internos.
 // Fila FIFO manual p/ ordem de chegada na triagem (RF-022). Sem java.util.Queue.
-public class FilaTriagem<T> {
+public class FilaTriagem<T> implements Iterable<T> {
 
     private static class No<T> {
         T dado;
@@ -54,5 +58,29 @@ public class FilaTriagem<T> {
 
     public int tamanho() {
         return tamanho;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new FilaIterator();
+    }
+
+    private class FilaIterator implements Iterator<T> {
+        private No<T> atual = cabeca;
+
+        @Override
+        public boolean hasNext() {
+            return atual != null;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException("Sem mais elementos na fila.");
+            }
+            T dado = atual.dado;
+            atual = atual.proximo;
+            return dado;
+        }
     }
 }

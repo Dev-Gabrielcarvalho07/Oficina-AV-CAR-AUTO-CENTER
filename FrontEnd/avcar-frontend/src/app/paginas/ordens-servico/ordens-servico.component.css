@@ -169,3 +169,26 @@
   gap: 10px;
   padding-top: 4px;
 }
+
+/* ── Botões de ação agrupados na célula ─────── */
+.acoes-grupo {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── Linha clicável ──────────────────────────── */
+.tr-clicavel { cursor: pointer; }
+.tr-clicavel:hover td { background: var(--bg-600); }
+
+/* ── Valores somente leitura no modal ────────── */
+.detalhe-valor {
+  font-size: 14px;
+  color: var(--text-100);
+  padding: 2px 0;
+}
+
+.detalhe-total {
+  font-weight: 600;
+  color: var(--accent);
+}

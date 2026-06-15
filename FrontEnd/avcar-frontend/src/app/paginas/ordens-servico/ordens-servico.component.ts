@@ -38,9 +38,13 @@ export class OrdensServicoComponent implements OnInit {
   termoBusca                = '';
   avancando: Set<number>    = new Set();
 
-  modalAberto = false;
-  salvando    = false;
-  erroModal   = '';
+  osVisualizando: OrdemServico | null = null;
+
+  modalAberto  = false;
+  modoEdicaoOs = false;
+  idEdicaoOs: number | null = null;
+  salvando     = false;
+  erroModal    = '';
 
   form: FormNovaOS = this.formVazio();
 
@@ -141,16 +145,47 @@ export class OrdensServicoComponent implements OnInit {
     });
   }
 
+  abrirVisualizacao(os: OrdemServico): void {
+    this.osVisualizando = os;
+    this.cdr.detectChanges();
+  }
+
+  fecharVisualizacao(): void {
+    this.osVisualizando = null;
+    this.cdr.detectChanges();
+  }
+
   abrirModal(): void {
-    this.form        = this.formVazio();
+    this.modoEdicaoOs = false;
+    this.idEdicaoOs   = null;
+    this.form         = this.formVazio();
+    this.erroModal    = '';
+    this.modalAberto  = true;
+    this.cdr.detectChanges();
+  }
+
+  abrirModalEdicao(os: OrdemServico): void {
+    this.modoEdicaoOs = true;
+    this.idEdicaoOs   = os.id;
+    this.form = {
+      idPessoa:       os.idPessoa,
+      idVeiculo:      os.idVeiculo,
+      valorMaoObra:   os.valorMaoObra   ?? null,
+      valorPecas:     os.valorPecas     ?? null,
+      deslocamento:   os.deslocamento   ?? null,
+      servicoGuincho: os.servicoGuincho ?? null,
+      outros:         os.outros         ?? null,
+    };
     this.erroModal   = '';
     this.modalAberto = true;
     this.cdr.detectChanges();
   }
 
   fecharModal(): void {
-    this.modalAberto = false;
-    this.salvando    = false;
+    this.modalAberto  = false;
+    this.modoEdicaoOs = false;
+    this.idEdicaoOs   = null;
+    this.salvando     = false;
     this.cdr.detectChanges();
   }
 
@@ -171,14 +206,21 @@ export class OrdensServicoComponent implements OnInit {
       outros:         this.form.outros         ?? undefined,
     };
 
-    this.api.post<OrdemServico>('/ordens-servico', payload).subscribe({
+    const req = this.modoEdicaoOs && this.idEdicaoOs
+      ? this.api.put<OrdemServico>(`/ordens-servico/${this.idEdicaoOs}`, payload)
+      : this.api.post<OrdemServico>('/ordens-servico', payload);
+
+    const msgSucesso = this.modoEdicaoOs ? 'OS atualizada com sucesso.' : 'OS aberta com sucesso.';
+    const msgErro    = this.modoEdicaoOs ? 'Erro ao atualizar OS.'      : 'Erro ao abrir OS.';
+
+    req.subscribe({
       next: r => {
         if (r.sucesso) {
-          this.toast.sucesso('OS aberta com sucesso.');
+          this.toast.sucesso(msgSucesso);
           this.fecharModal();
           this.carregar();
         } else {
-          this.erroModal = r.mensagem ?? 'Erro ao abrir OS.';
+          this.erroModal = r.mensagem ?? msgErro;
           this.salvando  = false;
           this.cdr.detectChanges();
         }

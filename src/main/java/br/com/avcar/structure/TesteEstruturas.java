@@ -10,6 +10,7 @@ public class TesteEstruturas {
 
     public static void main(String[] args) {
         testarFila();
+        testarIterator();
         testarOrdenacao();
         testarBusca();
     }
@@ -25,6 +26,19 @@ public class TesteEstruturas {
         System.out.println("Desenfileirar: " + fila.desenfileirar());
         System.out.println("Desenfileirar: " + fila.desenfileirar());
         System.out.println("Vazia: " + fila.estaVazia());
+        System.out.println();
+    }
+
+    private static void testarIterator() {
+        System.out.println("=== D) FilaTriagem — ITERATOR (for-each, FIFO) ===");
+        FilaTriagem<String> fila = new FilaTriagem<>();
+        fila.enfileirar("OS-001");
+        fila.enfileirar("OS-002");
+        fila.enfileirar("OS-003");
+        for (String item : fila) {
+            System.out.println("  item: " + item);
+        }
+        System.out.println("Tamanho apos iteracao (fila intacta): " + fila.tamanho());
         System.out.println();
     }
 

@@ -7,6 +7,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ApiService, ApiResponse } from '../../core/api.service';
 import { Veiculo, Modelo, Marca } from '../../core/models';
 import { ToastService } from '../../core/toast.service';
+import { capitalizarPalavras } from '../../core/text.util';
 
 interface FormVeiculo {
   placa:         string;
@@ -41,6 +42,8 @@ export class VeiculosComponent implements OnInit {
   idEdicao: number | null = null;
 
   form: FormVeiculo = this.formVazio();
+
+  readonly capitalizarPalavras = capitalizarPalavras;
 
   ngOnInit(): void {
     this.carregar();

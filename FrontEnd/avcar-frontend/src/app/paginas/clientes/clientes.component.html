@@ -99,7 +99,8 @@
 
           <div class="campo">
             <label>Nome <span class="obrig">*</span></label>
-            <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome completo" />
+            <input class="input" [(ngModel)]="form.nome" name="nome" placeholder="Nome completo"
+                   (blur)="form.nome = capitalizarPalavras(form.nome)" />
           </div>
 
           @if (form.tipo === 'PF') {
@@ -117,7 +118,11 @@
             <div class="campo-grupo">
               <div class="campo">
                 <label>CNPJ <span class="obrig">*</span></label>
-                <input class="input" [(ngModel)]="form.cnpj" name="cnpj" placeholder="00.000.000/0000-00" />
+                <input class="input"
+                       [ngModel]="form.cnpj"
+                       (ngModelChange)="form.cnpj = formatarCnpj($event)"
+                       name="cnpj"
+                       placeholder="00.000.000/0000-00" />
               </div>
               <div class="campo">
                 <label>Inscrição Estadual</label>

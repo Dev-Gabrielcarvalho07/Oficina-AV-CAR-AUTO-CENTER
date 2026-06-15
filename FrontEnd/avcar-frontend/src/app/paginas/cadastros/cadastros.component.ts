@@ -9,6 +9,7 @@ import { ToastService } from '../../core/toast.service';
 import {
   Funcao, Colaborador, Fornecedor, Peca, ServicoInterno,
 } from '../../core/models';
+import { capitalizarPalavras } from '../../core/text.util';
 
 export type AbaId = 'funcoes' | 'colaboradores' | 'fornecedores' | 'pecas' | 'servicos';
 
@@ -59,6 +60,8 @@ export class CadastrosComponent implements OnInit {
   idEdicao: number | null = null;
 
   form: FormCadastros = this.formVazio();
+
+  readonly capitalizarPalavras = capitalizarPalavras;
 
   // Dados por aba
   funcoes:       Funcao[]         = [];
@@ -192,7 +195,7 @@ export class CadastrosComponent implements OnInit {
         break;
       case 'fornecedores':
         this.form.nome           = String(obj['nome'] ?? '');
-        this.form.cnpj           = String(obj['cnpj'] ?? '');
+        this.form.cnpj           = this.formatarCnpj(String(obj['cnpj'] ?? ''));
         this.form.tipoFornecedor = String(obj['tipoFornecedor'] ?? 'PECAS');
         this.form.telefone       = String(obj['telefone'] ?? '');
         this.form.email          = String(obj['email'] ?? '');
@@ -318,6 +321,15 @@ export class CadastrosComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  formatarCnpj(valor: string): string {
+    const d = valor.replace(/\D/g, '').slice(0, 14);
+    if (d.length <= 2)  return d;
+    if (d.length <= 5)  return `${d.slice(0, 2)}.${d.slice(2)}`;
+    if (d.length <= 8)  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
   }
 
   // Retorna undefined (sem garantia), number (dias), ou null (input inválido).

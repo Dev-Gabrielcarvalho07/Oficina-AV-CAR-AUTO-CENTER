@@ -7,6 +7,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { ApiService, ApiResponse } from '../../core/api.service';
 import { Cliente } from '../../core/models';
 import { ToastService } from '../../core/toast.service';
+import { capitalizarPalavras } from '../../core/text.util';
 
 type TipoForm = 'PF' | 'PJ';
 
@@ -51,6 +52,8 @@ export class ClientesComponent implements OnInit {
   inativando = new Set<number>();
 
   form: FormCliente = this.formVazio();
+
+  readonly capitalizarPalavras = capitalizarPalavras;
 
   ngOnInit(): void {
     this.carregar();
@@ -123,7 +126,7 @@ export class ClientesComponent implements OnInit {
         tipo: 'PJ',
         nome: c.nome,
         cpf: '', rg: '',
-        cnpj:              (x['cnpj'] as string) ?? '',
+        cnpj:              this.formatarCnpj((x['cnpj'] as string) ?? ''),
         inscricaoEstadual: (x['inscricaoEstadual'] as string) ?? '',
         nomeFantasia:      (x['nomeFantasia'] as string) ?? '',
         nomeContato:       (x['nomeContato'] as string) ?? '',
@@ -232,5 +235,14 @@ export class ClientesComponent implements OnInit {
 
   estaInativando(id: number): boolean {
     return this.inativando.has(id);
+  }
+
+  formatarCnpj(valor: string): string {
+    const d = valor.replace(/\D/g, '').slice(0, 14);
+    if (d.length <= 2)  return d;
+    if (d.length <= 5)  return `${d.slice(0, 2)}.${d.slice(2)}`;
+    if (d.length <= 8)  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
   }
 }

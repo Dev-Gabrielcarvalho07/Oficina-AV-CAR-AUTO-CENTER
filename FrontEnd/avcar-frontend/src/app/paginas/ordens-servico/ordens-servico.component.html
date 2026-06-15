@@ -41,7 +41,7 @@
             </tr>
           } @else {
             @for (os of ordens; track os.id) {
-              <tr>
+              <tr class="tr-clicavel" (dblclick)="abrirVisualizacao(os)" title="Duplo-clique para ver detalhes">
                 <td class="mono">#{{ os.numeroOs }}</td>
                 <td>{{ nomeCliente(os.idPessoa) }}</td>
                 <td class="mono-accent">{{ placaVeiculo(os.idVeiculo) }}</td>
@@ -53,16 +53,21 @@
                 <td class="mono-accent">{{ formatarMoeda(os.total) }}</td>
                 <td>
                   @if (os.statusOs !== 'FINALIZACAO') {
-                    <button
-                      class="btn-avancar"
-                      type="button"
-                      [class.carregando]="estaAvancando(os.id)"
-                      [disabled]="estaAvancando(os.id)"
-                      (click)="avancar(os)"
-                      title="Avançar status"
-                    >
-                      @if (estaAvancando(os.id)) { ⟳ } @else { Avançar → }
-                    </button>
+                    <div class="acoes-grupo">
+                      <button class="btn-row-action" type="button" (click)="abrirModalEdicao(os)">
+                        Editar
+                      </button>
+                      <button
+                        class="btn-avancar"
+                        type="button"
+                        [class.carregando]="estaAvancando(os.id)"
+                        [disabled]="estaAvancando(os.id)"
+                        (click)="avancar(os)"
+                        title="Avançar status"
+                      >
+                        @if (estaAvancando(os.id)) { ⟳ } @else { Avançar → }
+                      </button>
+                    </div>
                   } @else {
                     <span class="finalizado">Finalizada</span>
                   }
@@ -75,12 +80,102 @@
     }
   </div>
 
+  <!-- Modal Visualização OS (somente leitura) -->
+  @if (osVisualizando) {
+    <div class="overlay" (click)="fecharVisualizacao()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>OS #{{ osVisualizando.numeroOs }} — Detalhes</h3>
+          <button class="btn-fechar" type="button" (click)="fecharVisualizacao()">✕</button>
+        </div>
+
+        <p class="secao-label">Identificação</p>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Status</label>
+            <span class="detalhe-valor">
+              <span [class]="classeBadge(osVisualizando.statusOs)">
+                {{ rotuloStatus(osVisualizando.statusOs) }}
+              </span>
+            </span>
+          </div>
+          <div class="campo">
+            <label>Prioridade</label>
+            <span class="detalhe-valor">{{ osVisualizando.prioridade }}</span>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Cliente</label>
+            <span class="detalhe-valor">{{ nomeCliente(osVisualizando.idPessoa) }}</span>
+          </div>
+          <div class="campo">
+            <label>Veículo</label>
+            <span class="detalhe-valor mono-accent">{{ placaVeiculo(osVisualizando.idVeiculo) }}</span>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Entrada</label>
+            <span class="detalhe-valor">{{ osVisualizando.dataEntrada }}</span>
+          </div>
+          <div class="campo">
+            <label>Saída</label>
+            <span class="detalhe-valor">{{ osVisualizando.dataSaida ?? '—' }}</span>
+          </div>
+        </div>
+
+        <p class="secao-label">Valores</p>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Mão de obra</label>
+            <span class="detalhe-valor mono-accent">{{ formatarMoeda(osVisualizando.valorMaoObra) }}</span>
+          </div>
+          <div class="campo">
+            <label>Peças</label>
+            <span class="detalhe-valor mono-accent">{{ formatarMoeda(osVisualizando.valorPecas) }}</span>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Deslocamento</label>
+            <span class="detalhe-valor mono-accent">{{ formatarMoeda(osVisualizando.deslocamento) }}</span>
+          </div>
+          <div class="campo">
+            <label>Guincho</label>
+            <span class="detalhe-valor mono-accent">{{ formatarMoeda(osVisualizando.servicoGuincho) }}</span>
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <div class="campo">
+            <label>Outros</label>
+            <span class="detalhe-valor mono-accent">{{ formatarMoeda(osVisualizando.outros) }}</span>
+          </div>
+          <div class="campo">
+            <label>Total</label>
+            <span class="detalhe-valor mono-accent detalhe-total">{{ formatarMoeda(osVisualizando.total) }}</span>
+          </div>
+        </div>
+
+        <div class="modal-acoes">
+          <button type="button" class="btn-secondary" (click)="fecharVisualizacao()">Fechar</button>
+        </div>
+      </div>
+    </div>
+  }
+
   <!-- Modal Nova OS -->
   @if (modalAberto) {
     <div class="overlay" (click)="fecharModal()">
       <div class="modal-card" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h3>Nova Ordem de Serviço</h3>
+          <h3>{{ modoEdicaoOs ? 'Editar OS' : 'Nova Ordem de Serviço' }}</h3>
           <button class="btn-fechar" type="button" (click)="fecharModal()">✕</button>
         </div>
 
@@ -149,7 +244,7 @@
               Cancelar
             </button>
             <button type="submit" class="btn-primary" [disabled]="salvando">
-              {{ salvando ? 'Salvando…' : 'Abrir OS' }}
+              {{ salvando ? 'Salvando…' : (modoEdicaoOs ? 'Salvar alterações' : 'Abrir OS') }}
             </button>
           </div>
         </form>

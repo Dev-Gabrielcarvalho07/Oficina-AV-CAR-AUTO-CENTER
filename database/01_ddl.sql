@@ -505,8 +505,8 @@ CREATE TABLE public.pessoa (
     id_pessoa integer NOT NULL,
     nome character varying(100) NOT NULL,
     email character varying(100),
-    cep character varying(9) NOT NULL,
-    logradouro character varying(100) NOT NULL,
+    cep character varying(9),
+    logradouro character varying(100),
     numero character varying(10),
     complemento character varying(50)
 );

@@ -81,7 +81,8 @@
               <label>Marca <span class="obrig">*</span></label>
               <input class="input" [(ngModel)]="form.marca" name="marca"
                      placeholder="Ex: Toyota"
-                     list="datalist-marcas" autocomplete="off" />
+                     list="datalist-marcas" autocomplete="off"
+                     (blur)="form.marca = capitalizarPalavras(form.marca)" />
               <datalist id="datalist-marcas">
                 @for (m of marcas; track m.id) {
                   <option [value]="m.nome"></option>
@@ -92,7 +93,8 @@
               <label>Modelo <span class="obrig">*</span></label>
               <input class="input" [(ngModel)]="form.modelo" name="modelo"
                      placeholder="Ex: Corolla"
-                     list="datalist-modelos" autocomplete="off" />
+                     list="datalist-modelos" autocomplete="off"
+                     (blur)="form.modelo = capitalizarPalavras(form.modelo)" />
               <datalist id="datalist-modelos">
                 @for (m of modelos; track m.id) {
                   <option [value]="m.nome"></option>
@@ -104,7 +106,8 @@
           <div class="campo-grupo">
             <div class="campo">
               <label>Cor <span class="obrig">*</span></label>
-              <input class="input" [(ngModel)]="form.cor" name="cor" placeholder="Ex: Prata" />
+              <input class="input" [(ngModel)]="form.cor" name="cor" placeholder="Ex: Prata"
+                     (blur)="form.cor = capitalizarPalavras(form.cor)" />
             </div>
             <div class="campo">
               <label>Quilometragem</label>
